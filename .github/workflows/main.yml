@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pulumi-up:
-    name: pulumi-up
+  pulumi-destroy:
+    name: pulumi-destroy
     runs-on: ubuntu-latest
 
     steps:
@@ -37,10 +37,10 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
-      - name: Pulumi Up
+      - name: Pulumi destroy
         uses: pulumi/actions@v5
         with:
-          command: up
+          command: destroy
           stack-name: BLURFACEX/dev/devstack
           work-dir: ./ppinfra
         env:
