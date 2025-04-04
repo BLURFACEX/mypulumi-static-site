@@ -10,6 +10,7 @@ jobs:
   pulumi-up:
     name: pulumi-up
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,15 +24,18 @@ jobs:
         working-directory: ./ppinfra
         run: npm install
 
-      - uses: pulumi/actions@v5
+      - name: Configure AWS Region
+        working-directory: ./ppinfra
+        run: pulumi config set aws:region us-east-2
+
+      - name: Pulumi Up
+        uses: pulumi/actions@v5
         with:
           command: up
           stack-name: BLURFACEX/dev/devstack
           work-dir: ./ppinfra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          # If you do not have Pulumi ESC configured then uncomment: 
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-
