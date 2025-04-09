@@ -1,50 +1,26 @@
-name: main
-
+name: Deploy Static Website with OIDC
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
+    branches: [ main ]
 jobs:
-  pulumi-destroy:
-    name: pulumi-destroy
+  deploy:
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        working-directory: ./ppinfra
-        run: npm install
-
-      - name: Pulumi Login
-        run: pulumi login
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
-      - name: Select Stack and Set Region
-        working-directory: ./ppinfra
-        run: |
-          pulumi stack select BLURFACEX/dev/devstack
-          pulumi config set aws:region us-east-2
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
-      - name: Pulumi destroy
-        uses: pulumi/actions@v5
-        with:
-          command: destroy
-          stack-name: BLURFACEX/dev/devstack
-          work-dir: ./ppinfra
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    - run: npm install
+    - uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: <role-arn-from-above>
+        aws-region: us-east-1
+    - uses: pulumi/actions@v5
+      with:
+        command: up
+        stack-name: dev
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
