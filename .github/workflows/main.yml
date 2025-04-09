@@ -11,10 +11,12 @@ jobs:
       with:
         node-version: '18'
     - run: npm install
+      working-directory: .infra  # Point to the subdirectory
     - uses: pulumi/actions@v5
       with:
         command: up
         stack-name: dev
+      working-directory: .infra  # Point to the subdirectory
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
